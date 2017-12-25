@@ -289,13 +289,17 @@ def dice_roller():
         rollsum = sum(rolls)
         rolltext = ' + '.join(str(roll) for roll in rolls)
         if mod:
-            modsgn = '- ' if mod < 0 else '+ '
-            modstr = modsgn + str(abs(mod))
-            return (
-                'Rolled: (%s) %s = %d'
-                % (rolltext, modstr, rollsum + mod)
+            modsgn = '-' if mod < 0 else '+'
+            modstr = modsgn + ' ' + str(abs(mod))
+            rollstr = (
+                'Rolled %dd%d%s%d: '
+                % (ndice, nfaces, modsgn, mod)
                 )
-        return 'Rolled: %s = %d' % (rolltext, rollsum)
+            return (
+                '%s(%s) %s = %d'
+                % (rollstr, rolltext, modstr, rollsum + mod)
+                )
+        return 'Rolled %dd%d: %s = %d' % (ndice, nfaces, rolltext, rollsum)
 
     def wrapper(parsed):
         """Roll format: <dice>d<faces>[+-]<mod>"""
