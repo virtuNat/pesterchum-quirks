@@ -384,15 +384,13 @@ class CommandDispatcher(object):
             return msg
         except SyntaxError as exc:
             return exc.args[0]
-        else:
-            try:
-                graft = self.__commands[tokens[0][0]](tokens[1:])
-            except KeyError:
-                return msg
-            else:
-                if graft:
-                    return graft.value
-                return self.__commands[tokens[0][0]].func.__doc__
+        try:
+            graft = self.__commands[tokens[0][0]](tokens[1:])
+        except KeyError:
+            return msg
+        if graft:
+            return graft.value
+        return self.__commands[tokens[0][0]].func.__doc__
 
 
 bot = CommandDispatcher('>')
