@@ -37,7 +37,7 @@ class TrifidEncoder(object):
             # Don't bother enciphering when there's only one index.
             return keys
         # Separate the indices into their quarternary digits.
-        keytable = [[i // 16, i % 16 // 4, i % 4] for i in keys]
+        keytable = [(i >> 4, i >> 2 & 3, i & 3) for i in keys]
         # Flip and flatten the 2d list.
         flatkeys = list(chain.from_iterable(zip(*keytable)))
         # Construct the new indices by taking the digits three at a time.
@@ -54,11 +54,9 @@ class TrifidEncoder(object):
             # Don't bother enciphering when there's only one index.
             return keys
         # Separate the indices into quarternary digits and flatten the list.
-        keychain = [
-            key for key in chain.from_iterable(
-                [i // 16, i % 16 // 4, i % 4] for i in keys
-                )
-            ]
+        keychain = list(chain.from_iterable(
+            (i >> 4, i >> 2 & 3, i & 3) for i in keys
+            ))
         # Rebuild the original 2d list and pull the old indices.
         keytable = [
             keychain[i]*16 + keychain[i+size]*4 + keychain[i+2*size]
@@ -87,18 +85,16 @@ class TrifidEncoder(object):
                 self.itable[char]
                 for char in intext[i:i+chunksize]
                 ]
-            chunklist.append(
-                ''.join(
-                    self.otable[key]
-                    for key in cipher(keys)
-                    )
-                )
+            chunklist.append(''.join(
+                self.otable[key]
+                for key in cipher(keys)
+                ))
         return ''.join(chunklist)
 
 
+default_encoder = TrifidEncoder('Join our memo: Anyone Want to Talk!')
 def trifidcipher(intext):
-    encoder = TrifidEncoder('Join our memo: Anyone Want to Talk!')
-    return encoder.digest(intext, 5, True)
+    return default_encoder.digest(intext, 5, True)
 trifidcipher.command = "trifid"
 
 
